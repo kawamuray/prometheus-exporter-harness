@@ -51,3 +51,7 @@ Running
 ```sh
 ./example_exporter --interval 10
 ```
+
+See Also
+========
+- [prometheus-json-exporter](https://github.com/kawamuray/prometheus-json-exporter)
