@@ -33,9 +33,16 @@ func (reg *MetricRegistry) Get(name string) prometheus.Collector {
 	return reg.metrics[name]
 }
 
+// Since prometheus.MetricVec is a struct but not interface,
+// need to intrduce an interface to check if we can call Reset() on a metric.
+type resettable interface {
+	Reset()
+}
+
 func (reg *MetricRegistry) Reset() {
-	for _, metric := range reg.metrics {
-		if vec, ok := metric.(*prometheus.MetricVec); ok {
+	for name, metric := range reg.metrics {
+		if vec, ok := metric.(resettable); ok {
+			log.Debugf("resetting metric;name:<%s>", name)
 			vec.Reset()
 		}
 	}
