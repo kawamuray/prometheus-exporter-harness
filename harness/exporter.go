@@ -3,8 +3,8 @@ package harness
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/codegangsta/cli"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/urfave/cli"
 	"net/http"
 	"time"
 )
