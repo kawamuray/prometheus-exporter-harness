@@ -40,5 +40,8 @@ func MakeApp(opts *ExporterOpts) *cli.App {
 }
 
 func Main(opts *ExporterOpts) {
-	MakeApp(opts).Run(os.Args)
+	err := MakeApp(opts).Run(os.Args)
+	if err != nil {
+		os.Exit(1)
+	}
 }
