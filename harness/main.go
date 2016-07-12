@@ -1,7 +1,8 @@
 package harness
 
 import (
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
+	"os"
 )
 
 func MakeApp(opts *ExporterOpts) *cli.App {
@@ -39,5 +40,8 @@ func MakeApp(opts *ExporterOpts) *cli.App {
 }
 
 func Main(opts *ExporterOpts) {
-	MakeApp(opts).RunAndExitOnError()
+	err := MakeApp(opts).Run(os.Args)
+	if err != nil {
+		os.Exit(1)
+	}
 }
