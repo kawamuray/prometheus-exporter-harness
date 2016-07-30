@@ -15,17 +15,30 @@ func MakeApp(opts *ExporterOpts) *cli.App {
 	app.UsageText = opts.Usage
 	app.Action = exp.main
 	app.Flags = append(opts.Flags,
-		cli.IntFlag{
-			Name:  "port",
-			Usage: "The port number used to expose metrics via http",
-			Value: 7979,
-		},
 		cli.StringFlag{
 			Name:  "log-level",
 			Usage: "Set Logging level",
 			Value: "info",
 		},
 	)
+
+	var portFlagExists bool
+	for _, flag := range opts.Flags {
+		if flag.GetName() == "port" {
+			portFlagExists = true
+			break
+		}
+	}
+	if !portFlagExists {
+		app.Flags = append(app.Flags,
+			cli.IntFlag{
+				Name:  "port",
+				Usage: "The port number used to expose metrics via http",
+				Value: 7979,
+			},
+		)
+	}
+
 	if opts.Tick {
 		app.Flags = append(app.Flags,
 			cli.IntFlag{
