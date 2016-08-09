@@ -5,16 +5,8 @@ import (
 	"os"
 )
 
-func MakeApp(opts *ExporterOpts) *cli.App {
-	exp := &exporter{opts}
-
-	app := cli.NewApp()
-	app.Name = opts.Name
-	app.Version = opts.Version
-	app.Usage = "A prometheus " + opts.Name
-	app.UsageText = opts.Usage
-	app.Action = exp.main
-	app.Flags = append(opts.Flags,
+var (
+	defaultOpts = []cli.Flag{
 		cli.IntFlag{
 			Name:  "port",
 			Usage: "The port number used to expose metrics via http",
@@ -25,18 +17,49 @@ func MakeApp(opts *ExporterOpts) *cli.App {
 			Usage: "Set Logging level",
 			Value: "info",
 		},
-	)
-	if opts.Tick {
-		app.Flags = append(app.Flags,
-			cli.IntFlag{
-				Name:  "interval",
-				Usage: "Interval to fetch metrics from the endpoint in second",
-				Value: 60,
-			},
-		)
+	}
+
+	defaultTickOpt = cli.IntFlag{
+		Name:  "interval",
+		Usage: "Interval to fetch metrics from the endpoint in second",
+		Value: 60,
+	}
+)
+
+func MakeApp(opts *ExporterOpts) *cli.App {
+	exp := &exporter{opts}
+
+	app := cli.NewApp()
+	app.Name = opts.Name
+	app.Version = opts.Version
+	app.Usage = "A prometheus " + opts.Name
+	app.UsageText = opts.Usage
+	app.Action = exp.main
+	app.Flags = buildOptsWithDefault(opts.Flags, defaultOpts)
+
+	if opts.Tick && !contains(app.Flags, defaultTickOpt) {
+		app.Flags = append(app.Flags, defaultTickOpt)
 	}
 
 	return app
+}
+
+func buildOptsWithDefault(opts []cli.Flag, defaultOpts []cli.Flag) []cli.Flag {
+	for _, opt := range defaultOpts {
+		if !contains(opts, opt) {
+			opts = append(opts, opt)
+		}
+	}
+	return opts
+}
+
+func contains(opts []cli.Flag, opt cli.Flag) bool {
+	for _, o := range opts {
+		if o.GetName() == opt.GetName() {
+			return true
+		}
+	}
+	return false
 }
 
 func Main(opts *ExporterOpts) {
