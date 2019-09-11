@@ -3,7 +3,7 @@ package harness
 import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/cli"
 	"net/http"
 	"time"
@@ -84,7 +84,7 @@ func (exp *exporter) main(c *cli.Context) {
 		w.Header().Add("Location", exp.MetricsPath)
 		w.WriteHeader(http.StatusFound)
 	})
-	http.Handle(exp.MetricsPath, prometheus.Handler())
+	http.Handle(exp.MetricsPath, promhttp.Handler())
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", c.Int("port")), nil); err != nil {
 		log.Fatal(err)
 	}
